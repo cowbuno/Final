@@ -3,8 +3,8 @@ package models
 type TemplateData struct {
 	CurrentYear     int
 	Post            *Post
-	Posts           []*Post
-	Categories        []string
+	Posts           *[]Post
+	Categories      []string
 	Form            any
 	Flash           string
 	IsAuthenticated bool

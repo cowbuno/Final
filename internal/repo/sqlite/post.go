@@ -193,12 +193,14 @@ func (s *Sqlite) GetAllPostByCategories(categoryIDs []int) ([]*models.Post, erro
 }
 
 func (s *Sqlite) GetAllPostPaginated(page int, pageSize int) (*[]models.Post, error) {
+	op := "sqlite.GetAllPostPaginated"
 	offset := (page - 1) * pageSize
-	query := `SELECT post_id, user_id, title, content, created, like, dislike, image_name FROM Post LIMIT ? OFFSET ?`
+	fmt.Println(offset)
+	stmt := `SELECT id, user_id, title, content, created, like, dislike, image_name FROM posts LIMIT ? OFFSET ?`
 
-	rows, err := s.db.Query(query, pageSize, offset)
+	rows, err := s.db.Query(stmt, pageSize, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	defer rows.Close()
 
@@ -206,9 +208,23 @@ func (s *Sqlite) GetAllPostPaginated(page int, pageSize int) (*[]models.Post, er
 	for rows.Next() {
 		var post models.Post
 		if err := rows.Scan(&post.PostID, &post.UserID, &post.Title, &post.Content, &post.Created, &post.Like, &post.Dislike, &post.ImageName); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("%s: %w", op, err)
 		}
 		posts = append(posts, post)
 	}
 	return &posts, nil
+}
+
+func (s *Sqlite) GetPageNumber(pageSize int) (int, error) {
+	op := "sqlite.GetPageNumber"
+	stmt := `SELECT COUNT(*) FROM posts`
+
+	var totalPosts int
+	err := s.db.QueryRow(stmt).Scan(&totalPosts)
+	if err != nil {
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+	totalPages := (totalPosts + pageSize - 1) / pageSize
+
+	return totalPages, nil
 }

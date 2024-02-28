@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"forum/models"
 )
 
@@ -33,4 +34,25 @@ func (s *service) GetPostByID(id int) (*models.Post, error) {
 	}
 	post.Categories = categories
 	return post, nil
+}
+
+func (s *service) GetAllPostPaginated(curentPage, pageSize int) (*[]models.Post, error) {
+	posts, err := s.repo.GetAllPostPaginated(curentPage, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(posts)
+	for _, post := range *posts {
+		categories, err := s.repo.GetCategoriesByPostID(post.PostID)
+		if err != nil {
+			return nil, err
+		}
+		post.Categories = categories
+	}
+	return posts, nil
+}
+
+func (s *service) GetPageNumber(pageSize int) (int, error) {
+	return 0, nil
 }

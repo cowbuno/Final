@@ -25,6 +25,7 @@ type UserServiceI interface {
 type PostServiceI interface {
 	CreatePost(string, string, string, []int) (int, error)
 	GetPostByID(int) (*models.Post, error)
+	GetAllPostPaginated(int, int) (*[]models.Post, error)
 }
 
 type CategoryServiceI interface {

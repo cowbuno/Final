@@ -30,7 +30,7 @@ type PostRepo interface {
 	// DeleteLikeAndDislike(int, int) error
 	// GetAllPostByUserID(int) ([]*models.Post, error)
 	// GetAllPostByCategories([]int) ([]*models.Post, error)
-	// GetAllPostPaginated(int, int) ([]*models.Post, error)
+	GetAllPostPaginated(page int, pageSize int) (*[]models.Post, error)
 }
 
 type CategoryRepo interface {

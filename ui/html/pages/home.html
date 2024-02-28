@@ -1,18 +1,38 @@
 {{define "title"}}Home {{end}}
 {{define "main"}}
-        <h2>Latest Snippets</h2>
-        <table>
-                <tr>
-                        <th>Title</th>
-                        <th>Created</th>
-                        <th>ID</th>
-                </tr>
-                <tr>
-                        <td><a href="/post/view/">Title</a></td>
-                        <td>Created</td>
-                        <td>ID</td>
-                </tr>
-               
-        </table>
-       
+<form action="/" method="POST">
+        <div>
+                <label>Category</label>
+                {{range $index, $category := .Categories}}
+                        <input type="checkbox" name="categories" value="{{$index}}">{{$category}}</input>
+                {{end}}
+        </div>
+        <div>
+                <input class="Filter" type="submit" value="Apply">
+        </div>
+</form>
+
+<h2>Posts</h2>
+<div>
+    {{range .Posts}}
+    <article>
+        <div>
+            <h3>{{.Title}}</h3>
+            <time datetime="{{.Created}}"></time>
+            <div>Posted by {{.UserName}}</div>
+        </div>
+        <section>
+            <p>{{.Content}}</p>
+        </section>
+        <div>
+            <div>Likes: {{.Like}}, Dislikes: {{.Dislike}}</div>
+            <div>Categories: 
+                {{range $id, $name := .Categories}}
+                {{$name}},
+                {{end}}
+            </div>
+        </div>
+    </article>
+    {{end}}
+</div>
 {{end}}

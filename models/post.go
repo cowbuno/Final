@@ -7,16 +7,17 @@ import (
 )
 
 type Post struct {
-	PostID    int
-	UserID    int
-	Title     string
-	Content   string
-	ImageName string
-	Created   time.Time
-	Like      int
-	Dislike   int
-	Comment   *[]Comment
-	Categories  map[int]string
+	PostID     int
+	UserID     int
+	UserName   string
+	Title      string
+	Content    string
+	ImageName  string
+	Created    time.Time
+	Like       int
+	Dislike    int
+	Comment    *[]Comment
+	Categories map[int]string
 }
 
 type Comment struct {
