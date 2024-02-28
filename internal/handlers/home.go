@@ -21,7 +21,7 @@ func (h *handler) home(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		h.app.ServerError(w, err)
 	}
-
+	
 	data.Posts = posts
 	h.app.Render(w, http.StatusOK, "home.html", data)
 }

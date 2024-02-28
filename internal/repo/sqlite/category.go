@@ -84,6 +84,5 @@ func (s *Sqlite) GetCategoriesByPostID(postID int) (map[int]string, error) {
 		}
 		category[categoryID] = categoryName
 	}
-	fmt.Println(category)
 	return category, nil
 }
