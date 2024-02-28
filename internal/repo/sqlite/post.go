@@ -1,15 +1,42 @@
 package sqlite
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"forum/models"
 	"strings"
 )
 
-func (s *Sqlite) CreatePost(post *models.Post) error {
-	const query = `INSERT INTO Post (user_id, title, content, image_name) VALUES (?, ?, ?, ?)`
-	_, err := s.db.Exec(query, post.UserID, post.Title, post.Content, post.ImageName)
+func (s *Sqlite) CreatePost(userID int, title, content, imageName string) (int, error) {
+	op := "sqlite.CreatePost"
+	const query = `INSERT INTO posts (user_id, title, content, image_name) VALUES (?, ?, ?, ?)`
+	result, err := s.db.Exec(query, userID, title, content, imageName)
+	if err != nil {
+		return -1, fmt.Errorf("%s: %w", op, err)
+	}
 
-	return err
+	postID, err := result.LastInsertId()
+	if err != nil {
+		return -1, fmt.Errorf("%s: %w", op, err)
+	}
+
+	return int(postID), nil
+}
+
+func (s *Sqlite) GetPostByID(postID int) (*models.Post, error) {
+	op := "sqlite.GetPostByID"
+	stmt := `SELECT id, user_id, title, content, created, like, dislike, image_name FROM posts WHERE id = ? ORDER BY created asc`
+	post := models.Post{}
+
+	err := s.db.QueryRow(stmt, postID).Scan(&post.PostID, &post.UserID, &post.Title, &post.Content, &post.Created, &post.Like, &post.Dislike, &post.ImageName)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRecord
+		}
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+	return &post, nil
 }
 
 func (s *Sqlite) GetAllPost() ([]models.Post, error) {

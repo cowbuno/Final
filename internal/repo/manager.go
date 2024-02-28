@@ -11,24 +11,30 @@ type UserRepo interface {
 	GetUserByEmail(string) (*models.User, error)
 	UpdateUserByID(string) (*models.User, error)
 	Authenticate(email, password string) (int, error)
+}
+
+type SessionRepo interface {
+	GetUserIDByToken(string) (int, error)
 	CreateSession(*models.Session) error
 	DeleteSessionByUserID(int) error
 	DeleteSessionByToken(string) error
 }
 
-// type PostRepo interface {
-// 	CreatePost(*models.Post) error
-// 	GetAllPost() (*models.Post, error)
-// 	// UpdatePost(string, *models.Post) error
-// 	//AddLikeAndDislike(bool, string, string) error
-// 	DeleteLikeAndDislike(int, int) error
-// 	GetAllPostByUserID(int) ([]*models.Post, error)
-// 	GetAllPostByCategories([]int) ([]*models.Post, error)
-// 	GetAllPostPaginated(int, int) ([]*models.Post, error)
-// }
+type PostRepo interface {
+	CreatePost(userID int, title, content, imageName string) (int, error)
+	GetPostByID(int) (*models.Post, error)
+	GetCategoriesByPostID(int) (map[int]string, error)
+	// GetAllPost() (*models.Post, error)
+	// UpdatePost(string, *models.Post) error
+	//AddLikeAndDislike(bool, string, string) error
+	// DeleteLikeAndDislike(int, int) error
+	// GetAllPostByUserID(int) ([]*models.Post, error)
+	// GetAllPostByCategories([]int) ([]*models.Post, error)
+	// GetAllPostPaginated(int, int) ([]*models.Post, error)
+}
 
 type CategoryRepo interface {
-	// AddCategoryToPost(int, []int) error
+	AddCategoryToPost(int, []int) error
 	GetALLCategory() ([]string, error)
 	// CreateCategory(string) error
 }
@@ -42,7 +48,8 @@ type CategoryRepo interface {
 
 type RepoI interface {
 	UserRepo
-	//PostRepo
+	SessionRepo
+	PostRepo
 	CategoryRepo
 	// CommentRepo
 }

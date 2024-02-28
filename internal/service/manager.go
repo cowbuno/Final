@@ -12,6 +12,7 @@ type service struct {
 type ServiceI interface {
 	UserServiceI
 	CategoryServiceI
+	PostServiceI
 }
 
 type UserServiceI interface {
@@ -22,6 +23,8 @@ type UserServiceI interface {
 }
 
 type PostServiceI interface {
+	CreatePost(string, string, string, []int) (int, error)
+	GetPostByID(int) (*models.Post, error)
 }
 
 type CategoryServiceI interface {

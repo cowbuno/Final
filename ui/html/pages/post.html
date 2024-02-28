@@ -1,0 +1,19 @@
+{{define "title"}}Snippet #{{end}}
+
+{{define "main"}}
+<div class='snippet'>
+    <div class='metadata'>
+    <strong>{{.Post.Title}}</strong>
+    <span>#{{.Post.PostID}}</span>
+    </div>
+    <pre><code>{{.Post.Content}}</code></pre>
+    <div class='metadata'>
+    </div>
+
+    <div>
+        {{range $category := .Post.Categories}}
+        <p>{{$category}}</p>
+        {{end}}
+    </div>
+</div>
+{{end}}

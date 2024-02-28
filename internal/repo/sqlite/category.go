@@ -2,7 +2,33 @@ package sqlite
 
 import "fmt"
 
-func AddCategoryToPost(int, []int) error {
+func (s *Sqlite) AddCategoryToPost(postID int, categories []int) error {
+	const op = "sqlite.AddCategoryToPost"
+
+	tx, err := s.db.Begin()
+	if err != nil {
+		return fmt.Errorf("%s: %w", op, err)
+	}
+
+	stmt, err := tx.Prepare("INSERT INTO post_category (post_id, category_id) VALUES (?, ?)")
+	if err != nil {
+		_ = tx.Rollback()
+		return fmt.Errorf("%s: prepare statement: %w", op, err)
+	}
+	defer stmt.Close()
+
+	for _, categoryID := range categories {
+		_, err = stmt.Exec(postID, categoryID)
+		if err != nil {
+			_ = tx.Rollback()
+			return fmt.Errorf("%s: exec statement: %w", op, err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("%s: commit transaction: %w", op, err)
+	}
+
 	return nil
 }
 
@@ -33,22 +59,22 @@ func CreateCategory(string) error {
 	return nil
 }
 
-func (s *Sqlite) GetCategoryByPostID(postID int) (map[int]string, error) {
-	query := `SELECT 
-	category_id 
+func (s *Sqlite) GetCategoriesByPostID(postID int) (map[int]string, error) {
+	stmt := `SELECT 
+	category_id, 
 	category.name as name
 	FROM 
-	Post_Category 
-	INNER JOIN Category ON Post_Category.category_id = Category.category_id
-	WHERE post_id=? `
+	post_category 
+	INNER JOIN category ON post_category.category_id = category.id
+	WHERE post_id=?`
 
-	rows, err := s.db.Query(query, postID)
+	rows, err := s.db.Query(stmt, postID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var category map[int]string
+	category := make(map[int]string)
 	for rows.Next() {
 		var categoryID int
 		var categoryName string
@@ -56,8 +82,10 @@ func (s *Sqlite) GetCategoryByPostID(postID int) (map[int]string, error) {
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println("------------------------------------------------")
+		fmt.Println(categoryID, categoryName)
 		category[categoryID] = categoryName
 	}
-
+	fmt.Println(category)
 	return category, nil
 }
