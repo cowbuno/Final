@@ -36,3 +36,23 @@ func (s *service) CreateUser(user models.User) error {
 	err := s.repo.CreateUser(user)
 	return err
 }
+
+func (s *service) GetUserByToken(token string) (*models.User, error) {
+	userID, err := s.repo.GetUserIDByToken(token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return s.repo.GetUserByID(userID)
+}
+
+func (s *service) UpdateUserPassword(token string, newPassword string) error {
+
+	userID, err := s.repo.GetUserIDByToken(token)
+	if err != nil {
+		return err
+	}
+
+	return s.repo.UpdateUserPassword(userID, newPassword)
+}

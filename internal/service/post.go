@@ -55,6 +55,10 @@ func (s *service) GetAllPostByCategories(categories []int) (*[]models.Post, erro
 	if err != nil {
 		return nil, err
 	}
+
+	if err = s.getCategoryToPost(posts); err != nil {
+		return nil, err
+	}
 	return posts, nil
 }
 

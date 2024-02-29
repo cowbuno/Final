@@ -20,6 +20,8 @@ type UserServiceI interface {
 	CreateUser(models.User) error
 	Authenticate(string, string) (*models.Session, error)
 	DeleteSession(string) error
+	UpdateUserPassword(token string, newPassword string) error
+	GetUserByToken(token string) (*models.User, error)
 }
 
 type PostServiceI interface {

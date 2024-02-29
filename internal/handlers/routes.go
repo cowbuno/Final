@@ -20,7 +20,11 @@ func (h *handler) Routes() http.Handler {
 	mux.HandleFunc("/login", h.login)
 	mux.HandleFunc("/signup", h.signup)
 	mux.HandleFunc("/logout", h.logoutPost)
+
 	mux.HandleFunc("/account/view", h.PostByUser)
+	mux.HandleFunc("/account/password", h.UpdateUserPassword)
+	mux.HandleFunc("/account", h.userView)
+
 	return mux
 }
 

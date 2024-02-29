@@ -129,3 +129,55 @@ func (h *handler) PostByUser(w http.ResponseWriter, r *http.Request) {
 	h.app.Render(w, http.StatusOK, "user_posts.html", data)
 
 }
+
+func (h *handler) userView(w http.ResponseWriter, r *http.Request) {
+	data := h.app.NewTemplateData(r)
+	c := cookie.GetSessionCookie(r)
+
+	user, err := h.service.GetUserByToken(c.Value)
+	if err != nil {
+		h.app.ServerError(w, err)
+		return
+	}
+	data.User = user
+
+	h.app.Render(w, http.StatusOK, "user.html", data)
+}
+
+func (h *handler) UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+	methodResolver(w, r, h.UpdateUserPasswordGet, h.UpdateUserPasswordPost)
+}
+
+func (h *handler) UpdateUserPasswordGet(w http.ResponseWriter, r *http.Request) {
+	data := h.app.NewTemplateData(r)
+	data.Form = models.AccountPasswordUpdateForm{}
+	h.app.Render(w, http.StatusOK, "password.html", data)
+}
+
+func (h *handler) UpdateUserPasswordPost(w http.ResponseWriter, r *http.Request) {
+	form := models.AccountPasswordUpdateForm{
+		CurrentPassword:         r.FormValue("currentPassword"),
+		NewPassword:             r.FormValue("newPassword"),
+		NewPasswordConfirmation: r.FormValue("newPasswordConfirmation"),
+	}
+
+	form.CheckField(validator.NotBlank(form.CurrentPassword), "currentPassword", "This field cannot be blank")
+	form.CheckField(validator.NotBlank(form.NewPassword), "newPassword", "This field cannot be blank")
+	form.CheckField(validator.MinChars(form.NewPassword, 8), "newPassword", "This field must be at least 8 characters long")
+	form.CheckField(validator.NotBlank(form.NewPasswordConfirmation), "newPasswordConfirmation", "This field cannot be blank")
+	form.CheckField(form.NewPassword == form.NewPasswordConfirmation, "newPasswordConfirmation", "Passwords do not match")
+	if !form.Valid() {
+		data := h.app.NewTemplateData(r)
+		data.Form = form
+		h.app.Render(w, http.StatusUnprocessableEntity, "password.html", data)
+		return
+	}
+
+	c := cookie.GetSessionCookie(r)
+
+	if err := h.service.UpdateUserPassword(c.Value, form.NewPassword); err != nil {
+		h.app.ServerError(w, err)
+	}
+
+	http.Redirect(w, r, "/account", http.StatusSeeOther)
+}

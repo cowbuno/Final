@@ -25,8 +25,6 @@ func (s *Sqlite) GetUserByEmail(email string) (*models.User, error) {
 
 }
 
-func (s *Sqlite) UpdateUserByID(string) (*models.User, error) { return nil, nil }
-
 func (s *Sqlite) CreateUser(u models.User) error {
 	op := "sqlite.CreateUser"
 	stmt := `INSERT INTO users (name, email,hashed_password, created) VALUES(?, ?, ?, CURRENT_TIMESTAMP)`
@@ -74,4 +72,39 @@ func (s *Sqlite) Authenticate(email, password string) (int, error) {
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
 	return id, nil
+}
+
+func (s *Sqlite) UpdateUserPassword(id int, password string) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		return fmt.Errorf("sqlite.UpdateUserPassword: could not hash password: %w", err)
+	}
+
+	stmt := `UPDATE users SET hashed_password = ? WHERE id = ?`
+	_, err = s.db.Exec(stmt, hashedPassword, id)
+	if err != nil {
+		return fmt.Errorf("sqlite.UpdateUserPassword: %w", err)
+	}
+	return nil
+}
+
+func (s *Sqlite) UpdateUserEmail(id int, email string) error {
+	stmt := `UPDATE users SET email = ? WHERE id = ?`
+	_, err := s.db.Exec(stmt, email, id)
+	if err != nil {
+		if err.Error() == "UNIQUE constraint failed: users.email" {
+			return models.ErrDuplicateEmail
+		}
+		return fmt.Errorf("sqlite.UpdateUserEmail: %w", err)
+	}
+	return nil
+}
+
+func (s *Sqlite) UpdateUserName(id int, name string) error {
+	stmt := `UPDATE users SET name = ? WHERE id = ?`
+	_, err := s.db.Exec(stmt, name, id)
+	if err != nil {
+		return fmt.Errorf("sqlite.UpdateUserName: %w", err)
+	}
+	return nil
 }

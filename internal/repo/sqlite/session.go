@@ -1,6 +1,8 @@
 package sqlite
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"forum/models"
 )
@@ -12,6 +14,9 @@ func (s *Sqlite) GetUserIDByToken(token string) (int, error) {
 
 	err := s.db.QueryRow(stmt, token).Scan(&userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return -1, models.ErrNoRecord
+		}
 		return -1, fmt.Errorf("%s: %w", op, err)
 	}
 

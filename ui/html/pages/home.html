@@ -18,10 +18,9 @@
     <div class="post-card">
         <div class="card-header">
             <div class="user-data">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShkkazTAUNIxKrUcCEMB-7LFeClEFjRaoxAw&usqp=CAU" alt="">
                 <div>
-                    <p>Aliyev Abay</p>
-                    <span><time datetime="{{.Created}}"></time>5 min ago</span>
+                    <p>By {{.UserName}}</p>
+                    <span><time datetime=""></time>{{humanDate .Created }}</span>
                 </div>
             </div>
         </div>

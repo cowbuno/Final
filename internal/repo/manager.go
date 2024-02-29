@@ -9,8 +9,11 @@ type UserRepo interface {
 	CreateUser(models.User) error
 	GetUserByID(int) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
-	UpdateUserByID(string) (*models.User, error)
+	// UpdateUserByID(string) (*models.User, error)
 	Authenticate(email, password string) (int, error)
+	UpdateUserPassword(id int, password string) error
+	UpdateUserEmail(id int, email string) error
+	UpdateUserName(id int, name string) error
 }
 
 type SessionRepo interface {
