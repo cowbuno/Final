@@ -17,7 +17,7 @@
     {{range .Posts}}
     <article>
         <div>
-            <h3>{{.Title}}</h3>
+            <a href="post/{{.UserID}}"><h3>{{.Title}}</h3></a>
             <time datetime="{{.Created}}"></time>
             <div>Posted by {{.UserName}}</div>
         </div>
@@ -34,5 +34,22 @@
         </div>
     </article>
     {{end}}
+</div>
+
+<div class="pagination">
+    {{ $currentPage := .CurrentPage }}
+    {{ if gt $currentPage 1 }}
+    <a href="/?page={{sub $currentPage 1}}">Previous</a>
+    {{ end }}
+    {{ range $i := sequence 1 .NumberOfPage }}
+        {{ if eq $i $currentPage }}
+            <span>{{$i}}</span>
+        {{ else }}
+            <a href="/?page={{$i}}">{{$i}}</a>
+        {{ end }}
+    {{ end }}
+    {{ if lt $currentPage .NumberOfPage }}
+    <a href="/?page={{add $currentPage 1}}">Next</a>
+    {{ end }}
 </div>
 {{end}}

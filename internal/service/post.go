@@ -53,5 +53,5 @@ func (s *service) GetAllPostPaginated(curentPage, pageSize int) (*[]models.Post,
 }
 
 func (s *service) GetPageNumber(pageSize int) (int, error) {
-	return 0, nil
+	return s.repo.GetPageNumber(pageSize)
 }

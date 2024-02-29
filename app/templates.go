@@ -20,8 +20,23 @@ func humanDate(t time.Time) string {
 	return t.UTC().Format("02 Jan 2006 at 15:04")
 }
 
+func sequence(start, end int) []int {
+	var seq []int
+	for i := start; i <= end; i++ {
+		seq = append(seq, i)
+	}
+	return seq
+}
+
 var functions = template.FuncMap{
 	"humanDate": humanDate,
+	"add": func(a, b int) int {
+		return a + b
+	},
+	"sub": func(a, b int) int {
+		return a - b
+	},
+	"sequence": sequence,
 }
 
 func NewTemplateCache() (map[string]*template.Template, error) {

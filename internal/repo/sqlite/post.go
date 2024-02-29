@@ -195,7 +195,6 @@ func (s *Sqlite) GetAllPostByCategories(categoryIDs []int) ([]*models.Post, erro
 func (s *Sqlite) GetAllPostPaginated(page int, pageSize int) (*[]models.Post, error) {
 	op := "sqlite.GetAllPostPaginated"
 	offset := (page - 1) * pageSize
-	fmt.Println(offset)
 	stmt := `SELECT id, user_id, title, content, created, like, dislike, image_name FROM posts LIMIT ? OFFSET ?`
 
 	rows, err := s.db.Query(stmt, pageSize, offset)

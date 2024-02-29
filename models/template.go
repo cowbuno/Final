@@ -10,4 +10,6 @@ type TemplateData struct {
 	IsAuthenticated bool
 	CSRFToken       string
 	User            *User
+	NumberOfPage    int
+	CurrentPage     int
 }
