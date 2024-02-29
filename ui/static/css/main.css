@@ -1,3 +1,4 @@
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -25,6 +26,7 @@ main {
     margin-top: 54px;
     margin-bottom: 54px;
     min-height: calc(100vh - 340px);
+    padding: 0 50px;
     overflow: auto;
 }
 
@@ -291,4 +293,76 @@ footer {
 
 .menu li{
     margin-bottom: 5px;
+}
+
+
+.posts-container{
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-bottom: 20px;
+}
+
+.post-card{
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    padding: 30px;
+    border-radius: 10px;
+}
+
+.post-card .card-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.post-card .card-header img{
+    border-radius: 999999px;
+    width: 50px;
+    height: 50px;
+}
+
+.post-card .card-header .user-data{
+    display: flex;
+    gap: 12px;
+}
+
+.post-card .card-header .icon {
+    color: #34495E;
+}
+
+.post-card .content{
+    margin-bottom: 25px;
+}
+
+.post-card .content .title {
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+.post-card .content .desc {
+    font-style: italic;
+}
+
+.post-card .card-footer{
+    display: flex;
+    justify-content: space-between;
+}
+
+.post-card .card-footer{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-tags-wrapper{
+    display: flex;
+    gap: 10px;
+}
+
+.category-tag{
+    padding: 4px 7px;
+    border-radius: 5px;
+    background-color: #e0e0e0;
+    color: #7a7a7a;
+    font-size: 13px;
 }
