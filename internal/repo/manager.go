@@ -28,7 +28,7 @@ type PostRepo interface {
 	// UpdatePost(string, *models.Post) error
 	//AddLikeAndDislike(bool, string, string) error
 	// DeleteLikeAndDislike(int, int) error
-	// GetAllPostByUserID(int) ([]*models.Post, error)
+	GetAllPostByUserID(int) (*[]models.Post, error)
 	GetAllPostByCategories(categories []int) (*[]models.Post, error)
 	GetPageNumber(pageSize int) (int, error)
 	GetAllPostPaginated(page int, pageSize int) (*[]models.Post, error)

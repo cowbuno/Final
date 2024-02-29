@@ -112,3 +112,20 @@ func (h *handler) logoutPost(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
+
+func (h *handler) PostByUser(w http.ResponseWriter, r *http.Request) {
+	c := cookie.GetSessionCookie(r)
+	posts, err := h.service.GetAllPostByUser(c.Value)
+
+	if err != nil {
+		h.app.ServerError(w, err)
+		return
+	}
+
+	data := h.app.NewTemplateData(r)
+
+	data.Posts = posts
+
+	h.app.Render(w, http.StatusOK, "user_posts.html", data)
+
+}

@@ -140,7 +140,7 @@ func (s *Sqlite) DeleteLikeAndDislike(userID, postID int) error {
 }
 
 func (s *Sqlite) GetAllPostByUserID(userID int) (*[]models.Post, error) {
-	const query = `SELECT post_id, user_id, title, content, created, like, dislike, image_name FROM Post WHERE user_id=?`
+	const query = `SELECT id, user_id, title, content, created, like, dislike, image_name FROM posts WHERE user_id=?`
 	rows, err := s.db.Query(query, userID)
 	if err != nil {
 		return nil, err

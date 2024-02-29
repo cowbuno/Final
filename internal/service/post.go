@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"forum/models"
 )
 
@@ -41,14 +40,8 @@ func (s *service) GetAllPostPaginated(curentPage, pageSize int) (*[]models.Post,
 	if err != nil {
 		return nil, err
 	}
-
-	for i := range *posts {
-		categories, err := s.repo.GetCategoriesByPostID((*posts)[i].PostID)
-		if err != nil {
-			return nil, err
-
-		}
-		(*posts)[i].Categories = categories
+	if err = s.getCategoryToPost(posts); err != nil {
+		return nil, err
 	}
 	return posts, nil
 }
@@ -58,12 +51,37 @@ func (s *service) GetPageNumber(pageSize int) (int, error) {
 }
 
 func (s *service) GetAllPostByCategories(categories []int) (*[]models.Post, error) {
-	fmt.Println(AddCategory(categories))
 	posts, err := s.repo.GetAllPostByCategories(AddCategory(categories))
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
-	fmt.Println(posts)
 	return posts, nil
+}
+
+func (s *service) GetAllPostByUser(token string) (*[]models.Post, error) {
+	userID, err := s.repo.GetUserIDByToken(token)
+	if err != nil {
+		return nil, err
+	}
+	posts, err := s.repo.GetAllPostByUserID(userID)
+
+	if err != nil {
+		return nil, err
+	}
+	if err = s.getCategoryToPost(posts); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+func (s *service) getCategoryToPost(posts *[]models.Post) error {
+	for i := range *posts {
+		categories, err := s.repo.GetCategoriesByPostID((*posts)[i].PostID)
+		if err != nil {
+			return err
+
+		}
+		(*posts)[i].Categories = categories
+	}
+	return nil
 }
