@@ -1,26 +1,39 @@
 {{define "title"}}Your post {{end}}
 {{define "main"}}
 <h2>Your Posts</h2>
-<div>
+<div class="posts-container">
     {{range .Posts}}
-    <article>
-        <div>
-            <a href="post/{{.UserID}}"><h3>{{.Title}}</h3></a>
-            <time datetime="{{.Created}}"></time>
-            <div>Posted by {{.UserName}}</div>
-        </div>
-        <section>
-            <p>{{.Content}}</p>
-        </section>
-        <div>
-            <div>Likes: {{.Like}}, Dislikes: {{.Dislike}}</div>
-            <div>Categories: 
-                {{range $id, $name := .Categories}}
-                        {{$name}},
-                {{end}}
+    <div class="post-card">
+        <div class="card-header">
+            <div class="user-data">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShkkazTAUNIxKrUcCEMB-7LFeClEFjRaoxAw&usqp=CAU" alt="">
+                <div>
+                    <p>Aliyev Abay</p>
+                    <span><time datetime="{{.Created}}"></time>5 min ago</span>
+                </div>
             </div>
         </div>
-    </article>
+            <div class="content">
+                <div class="title">
+                    <a href="post/{{.UserID}}"> {{.Title}} </a>
+                </div>
+                <div class="desc">
+                    {{.Content}}
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="category-tags-wrapper">
+                    {{range $category := .Categories}}
+                    <div class="category-tag">{{$category}}</div>
+                    {{end}}
+                </div>
+                <div>
+                    <span>Likes: {{.Like}} </span> <span>
+                        Dislikes: {{.Dislike}}
+                    </span> 
+                </div>
+            </div>
+        </div>
     {{end}}
 </div>
 
