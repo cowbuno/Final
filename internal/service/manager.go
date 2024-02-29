@@ -27,6 +27,7 @@ type PostServiceI interface {
 	GetPostByID(int) (*models.Post, error)
 	GetAllPostPaginated(int, int) (*[]models.Post, error)
 	GetPageNumber(int) (int, error)
+	GetAllPostByCategories(categories []int) (*[]models.Post, error)
 }
 
 type CategoryServiceI interface {

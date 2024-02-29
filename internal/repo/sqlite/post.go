@@ -161,12 +161,12 @@ func (s *Sqlite) GetAllPostByUserID(userID int) (*[]models.Post, error) {
 	return &posts, nil
 }
 
-func (s *Sqlite) GetAllPostByCategories(categoryIDs []int) ([]*models.Post, error) {
-	query := `SELECT p.post_id, p.user_id, p.title, p.content, p.created, p.like, p.dislike, p.image_name
-              FROM Post AS p
-              INNER JOIN Post_Category AS pc ON p.post_id = pc.post_id
+func (s *Sqlite) GetAllPostByCategories(categoryIDs []int) (*[]models.Post, error) {
+	query := `SELECT p.id, p.user_id, p.title, p.content, p.created, p.like, p.dislike, p.image_name
+              FROM posts AS p
+              INNER JOIN post_category AS pc ON p.id = pc.post_id
               WHERE pc.category_id IN (?` + strings.Repeat(",?", len(categoryIDs)-1) + `)
-              GROUP BY p.post_id`
+              GROUP BY p.id`
 
 	args := make([]interface{}, len(categoryIDs))
 	for i, id := range categoryIDs {
@@ -180,16 +180,16 @@ func (s *Sqlite) GetAllPostByCategories(categoryIDs []int) ([]*models.Post, erro
 	}
 	defer rows.Close()
 
-	var posts []*models.Post
+	var posts []models.Post
 	for rows.Next() {
 		var post models.Post
 		if err := rows.Scan(&post.PostID, &post.UserID, &post.Title, &post.Content, &post.Created, &post.Like, &post.Dislike, &post.ImageName); err != nil {
 			return nil, err
 		}
-		posts = append(posts, &post)
+		posts = append(posts, post)
 	}
 
-	return posts, nil
+	return &posts, nil
 }
 
 func (s *Sqlite) GetAllPostPaginated(page int, pageSize int) (*[]models.Post, error) {
