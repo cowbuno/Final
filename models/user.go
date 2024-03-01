@@ -14,6 +14,7 @@ type User struct {
 	HashedPassword []byte
 	Created        time.Time
 	Status         int
+	IsAdmin        bool
 }
 
 type UserLoginForm struct {

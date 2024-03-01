@@ -14,6 +14,8 @@ type UserRepo interface {
 	UpdateUserPassword(id int, password string) error
 	UpdateUserEmail(id int, email string) error
 	UpdateUserName(id int, name string) error
+	GetAllUsers() ([]*models.User, error)
+	DeleteUser(int) error
 }
 
 type SessionRepo interface {
@@ -59,5 +61,9 @@ type RepoI interface {
 }
 
 func New(storagePath string) (RepoI, error) {
-	return sqlite.NewDB(storagePath)
+	sqliteDB, err := sqlite.NewDB(storagePath)
+	if err != nil {
+		return nil, err
+	}
+	return sqliteDB, nil
 }

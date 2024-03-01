@@ -3,6 +3,7 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
+	"forum/models"
 )
 
 type Sqlite struct {
@@ -103,4 +104,27 @@ func NewDB(storagePath string) (*Sqlite, error) {
 	// }
 
 	return &Sqlite{db: db}, nil
+}
+func (s *Sqlite) GetAllUsers() ([]*models.User, error) {
+	var users []*models.User
+	rows, err := s.db.Query("SELECT id, name, email, hashed_password, created, status FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var u models.User
+		err := rows.Scan(&u.ID, &u.Name, &u.Email, &u.HashedPassword, &u.Created, &u.Status)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, &u)
+	}
+
+	return users, nil
+}
+func (s *Sqlite) DeleteUser(id int) error {
+	_, err := s.db.Exec("DELETE FROM users WHERE id = ?", id)
+	return err
 }

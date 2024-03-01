@@ -12,4 +12,5 @@ type TemplateData struct {
 	User            *User
 	NumberOfPage    int
 	CurrentPage     int
+	Users           []User
 }

@@ -13,6 +13,8 @@ type ServiceI interface {
 	UserServiceI
 	CategoryServiceI
 	PostServiceI
+	GetAllUsers() ([]models.User, error)
+	DeleteUser(int) error
 }
 
 type UserServiceI interface {

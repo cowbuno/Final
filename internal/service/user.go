@@ -56,3 +56,20 @@ func (s *service) UpdateUserPassword(token string, newPassword string) error {
 
 	return s.repo.UpdateUserPassword(userID, newPassword)
 }
+func (s *service) GetAllUsers() ([]models.User, error) {
+	userPointers, err := s.repo.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]models.User, len(userPointers))
+	for i, userPointer := range userPointers {
+		users[i] = *userPointer
+	}
+
+	return users, nil
+}
+
+func (s *service) DeleteUser(userID int) error {
+	return s.repo.DeleteUser(userID)
+}
