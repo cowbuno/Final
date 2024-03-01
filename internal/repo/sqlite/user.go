@@ -24,6 +24,23 @@ func (s *Sqlite) GetUserByEmail(email string) (*models.User, error) {
 	return &u, nil
 
 }
+func (s *Sqlite) CreateUserAndReturnID(u models.User) (int64, error) {
+	op := "sqlite.CreateUser"
+	stmt := `INSERT INTO users (name, email, hashed_password, created) VALUES (?, ?, ?, CURRENT_TIMESTAMP)`
+	result, err := s.db.Exec(stmt, u.Name, u.Email, string(u.HashedPassword))
+	if err != nil {
+		if err.Error() == "UNIQUE constraint failed: users.email" {
+			return 0, models.ErrDuplicateEmail
+		}
+		return 0, fmt.Errorf("%s: %w", op, err)
+	}
+
+	id, err := result.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("%s: unable to get last insert ID: %w", op, err)
+	}
+	return id, nil
+}
 
 func (s *Sqlite) CreateUser(u models.User) error {
 	op := "sqlite.CreateUser"
