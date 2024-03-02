@@ -19,7 +19,7 @@
         <td>{{.ID}}</td>
         <td>{{.Name}}</td>
         <td>{{.Email}}</td>
-        <td>{{.Created}}</td>
+        <td>{{humanDate .Created}}</td>
         <td>{{.Status}}</td>
         <td><a href="/admin/delete?id={{.ID}}">Delete</a></td>
     </tr>

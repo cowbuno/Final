@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"encoding/json"
+	"errors"
 	"forum/models"
 	"math/rand"
 	"net/http"
@@ -63,6 +64,9 @@ func (s *Sqlite) CreateParsePosts() error {
 		if post.Author != "" {
 			UserID, err = s.createParseUser(post.Author)
 			if err != nil {
+				if errors.Is(err, models.ErrDuplicateEmail) {
+					continue
+				}
 				return err
 			}
 		}
