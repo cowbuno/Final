@@ -16,6 +16,6 @@ func NewSession(UserID int) *Session {
 	return &Session{
 		UserID:  UserID,
 		Token:   uuid.New().String(),
-		ExpTime: time.Now().Add(5 * time.Minute),
+		ExpTime: time.Now().Add(1 * time.Minute),
 	}
 }

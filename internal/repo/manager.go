@@ -40,6 +40,7 @@ type PostRepo interface {
 }
 
 type CategoryRepo interface {
+	CreateParsePosts() error
 	AddCategoryToPost(int, []int) error
 	GetALLCategory() ([]string, error)
 	// CreateCategory(string) error

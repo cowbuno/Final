@@ -34,6 +34,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	s := service.New(r)
 
 	h := handlers.New(s, app)

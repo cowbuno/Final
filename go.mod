@@ -2,11 +2,8 @@ module forum
 
 go 1.20
 
-require golang.org/x/crypto v0.19.0
+require golang.org/x/crypto v0.20.0
 
 require github.com/mattn/go-sqlite3 v1.14.22
 
-require (
-	github.com/google/uuid v1.6.0 // indirect
-	github.com/gorilla/mux v1.8.1 // indirect
-)
+require github.com/google/uuid v1.6.0
