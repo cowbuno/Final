@@ -94,7 +94,7 @@ const (
 func sendActivationEmail(email, token string) error {
 	from := smtpUser
 	to := []string{email}
-	url := "http://localhost:8080/activate?token=" + token // Ссылка на вашу страницу активации
+	url := "http://localhost:8080/activate?token=" + token
 	body := fmt.Sprintf("To activate your account, please click on the following link: %s", url)
 	msg := "From: " + from + "\n" +
 		"To: " + email + "\n" +
