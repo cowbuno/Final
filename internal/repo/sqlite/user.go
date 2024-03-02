@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"forum/models"
+	"github.com/google/uuid"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -43,9 +44,10 @@ func (s *Sqlite) CreateUserAndReturnID(u models.User) (int64, error) {
 }
 
 func (s *Sqlite) CreateUser(u models.User) error {
+	activationToken := generateActivationToken()
 	op := "sqlite.CreateUser"
-	stmt := `INSERT INTO users (name, email,hashed_password, created) VALUES(?, ?, ?, CURRENT_TIMESTAMP)`
-	_, err := s.db.Exec(stmt, u.Name, u.Email, string(u.HashedPassword))
+	stmt := `INSERT INTO users (name, email, hashed_password, is_activated, activation_token, created) VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
+	_, err := s.db.Exec(stmt, u.Name, u.Email, string(u.HashedPassword), false, activationToken)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: users.email" {
 			return models.ErrDuplicateEmail
@@ -124,4 +126,23 @@ func (s *Sqlite) UpdateUserName(id int, name string) error {
 		return fmt.Errorf("sqlite.UpdateUserName: %w", err)
 	}
 	return nil
+}
+func generateActivationToken() string {
+	return uuid.New().String()
+}
+
+func (s *Sqlite) GetUserByActivationToken(token string) (*models.User, error) {
+	var user models.User
+	query := `SELECT id, name, email, is_activated FROM users WHERE activation_token = ?`
+	err := s.db.QueryRow(query, token).Scan(&user.ID, &user.Name, &user.Email, &user.IsActivated)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (s *Sqlite) ActivateUser(userID int) error {
+	query := `UPDATE users SET is_activated = 1, activation_token = '' WHERE id = ?`
+	_, err := s.db.Exec(query, userID)
+	return err
 }

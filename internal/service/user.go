@@ -1,7 +1,9 @@
 package service
 
 import (
+	"fmt"
 	"forum/models"
+	"net/smtp"
 )
 
 func (s *service) GetUser(id int) *models.User {
@@ -34,7 +36,15 @@ func (s *service) Authenticate(email string, password string) (*models.Session, 
 }
 func (s *service) CreateUser(user models.User) error {
 	err := s.repo.CreateUser(user)
-	return err
+	if err != nil {
+		return err
+	}
+
+	err = sendActivationEmail(user.Email, user.ActivationToken)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *service) GetUserByToken(token string) (*models.User, error) {
@@ -72,4 +82,42 @@ func (s *service) GetAllUsers() ([]models.User, error) {
 
 func (s *service) DeleteUser(userID int) error {
 	return s.repo.DeleteUser(userID)
+}
+
+const (
+	smtpServer   = "smtp.mail.ru"
+	smtpPort     = "587"
+	smtpUser     = "nurkhat.sergaziev@mail.ru"
+	smtpPassword = "itFCzPK0wcRVDxzTeDaD"
+)
+
+func sendActivationEmail(email, token string) error {
+	from := smtpUser
+	to := []string{email}
+	url := "http://localhost:8080/activate?token=" + token // Ссылка на вашу страницу активации
+	body := fmt.Sprintf("To activate your account, please click on the following link: %s", url)
+	msg := "From: " + from + "\n" +
+		"To: " + email + "\n" +
+		"Subject: Activate Your Account\n\n" +
+		body
+
+	auth := smtp.PlainAuth("", smtpUser, smtpPassword, smtpServer)
+	err := smtp.SendMail(smtpServer+":"+smtpPort, auth, from, to, []byte(msg))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *service) ActivateUser(token string) error {
+	user, err := s.repo.GetUserByActivationToken(token)
+	if err != nil {
+		return err // Пользователь не найден или другая ошибка
+	}
+
+	if user.IsActivated {
+		return fmt.Errorf("user already activated")
+	}
+
+	return s.repo.ActivateUser(user.ID)
 }

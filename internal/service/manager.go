@@ -15,6 +15,7 @@ type ServiceI interface {
 	PostServiceI
 	GetAllUsers() ([]models.User, error)
 	DeleteUser(int) error
+	ActivateUser(token string) error
 }
 
 type UserServiceI interface {

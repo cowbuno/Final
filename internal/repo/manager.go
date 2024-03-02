@@ -57,6 +57,8 @@ type RepoI interface {
 	SessionRepo
 	PostRepo
 	CategoryRepo
+	GetUserByActivationToken(activationToken string) (*models.User, error)
+	ActivateUser(userID int) error
 	// CommentRepo
 }
 

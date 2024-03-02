@@ -8,13 +8,14 @@ import (
 )
 
 type User struct {
-	ID             int64
-	Name           string
-	Email          string
-	HashedPassword []byte
-	Created        time.Time
-	Status         int
-	IsAdmin        bool
+	ID              int
+	Name            string
+	Email           string
+	HashedPassword  []byte
+	Created         time.Time
+	Status          int
+	IsActivated     bool
+	ActivationToken string
 }
 
 type UserLoginForm struct {

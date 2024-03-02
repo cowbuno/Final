@@ -26,6 +26,7 @@ func (h *handler) Routes() http.Handler {
 	mux.HandleFunc("/account", h.userView)
 	mux.HandleFunc("/admin/dashboard", h.adminDashboard)
 	mux.HandleFunc("/admin/delete", h.deleteUser)
+	mux.HandleFunc("/activate", h.activateAccount)
 
 	return mux
 }

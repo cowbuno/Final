@@ -181,3 +181,15 @@ func (h *handler) UpdateUserPasswordPost(w http.ResponseWriter, r *http.Request)
 
 	http.Redirect(w, r, "/account", http.StatusSeeOther)
 }
+
+func (h *handler) activateAccount(w http.ResponseWriter, r *http.Request) {
+	token := r.URL.Query().Get("token")
+
+	err := h.service.ActivateUser(token)
+	if err != nil {
+		http.Error(w, "Unable to activate account", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/login?activated=true", http.StatusSeeOther)
+}
