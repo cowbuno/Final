@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -15,14 +16,22 @@ func (h *handler) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) homeGet(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		h.app.ClientError(w, http.StatusNotFound)
+		return
+	}
 	currentPageStr := r.URL.Query().Get("page")
 	pageNumber, err := h.service.GetPageNumber(pageSize)
 	if err != nil {
 		h.app.ServerError(w, err)
 	}
 	currentPage, err := strconv.Atoi(currentPageStr)
-	if err != nil || currentPage < 1 || currentPage > pageNumber {
-		currentPage = defaultPage
+
+	if err != nil || currentPage < 1 {
+		h.app.ClientError(w, http.StatusBadRequest)
+		return
+	} else if currentPage > pageNumber {
+		h.app.ClientError(w, http.StatusNotFound)
 	}
 
 	data := h.app.NewTemplateData(r)
@@ -50,19 +59,28 @@ func (h *handler) homePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterCategoriesString := r.Form["categories"]
+	if len(filterCategoriesString) == 0{
+		h.app.ClientError(w, http.StatusBadRequest)
+		return
+	}
 	filterCategories, err := ConverCategories(filterCategoriesString)
 	if err != nil {
 		h.app.ClientError(w, http.StatusBadRequest)
+		return
 	}
 	posts, err := h.service.GetAllPostByCategories(filterCategories)
 	if err != nil {
 		h.app.ServerError(w, err)
+		return
+
 	}
 	data := h.app.NewTemplateData(r)
 
 	categories, err := h.service.GetAllCategory()
 	if err != nil {
 		h.app.ServerError(w, err)
+		return
+
 	}
 	data.Categories = categories
 
@@ -76,6 +94,9 @@ func ConverCategories(CategoriesString []string) ([]int, error) {
 		nb, err := strconv.Atoi(str)
 		if err != nil {
 			return nil, err
+		}
+		if nb > 10 {
+			return nil, fmt.Errorf("bad request")
 		}
 		categories[i] = nb
 	}

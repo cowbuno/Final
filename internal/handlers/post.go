@@ -60,11 +60,30 @@ func (h *handler) postCreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) postView(w http.ResponseWriter, r *http.Request) {
-	id, _ := strings.CutPrefix(r.URL.Path, "/post/")
-	ID, err := strconv.Atoi(id)
 
+	path := r.URL.Path
+	if path[:5] != "/post" {
+		h.app.ClientError(w, http.StatusNotFound)
+		fmt.Println("fdsafasdfasdfadsfads")
+		return
+	}
+
+	idStr := strings.TrimPrefix(path, "/post/")
+
+	if idStr == path || idStr == "" {
+		h.app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	ID, err := strconv.Atoi(idStr)
 	if err != nil {
-		h.app.ClientError(w, 400)
+		h.app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	if ID < 0 {
+		h.app.ClientError(w, http.StatusBadRequest)
+		return
 	}
 
 	post, err := h.service.GetPostByID(ID)
