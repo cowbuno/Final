@@ -24,26 +24,31 @@ func (h *handler) homeGet(w http.ResponseWriter, r *http.Request) {
 	pageNumber, err := h.service.GetPageNumber(pageSize)
 	if err != nil {
 		h.app.ServerError(w, err)
+		return
 	}
 	currentPage, err := strconv.Atoi(currentPageStr)
 
 	if err != nil || currentPage < 1 {
-		h.app.ClientError(w, http.StatusBadRequest)
-		return
+		currentPage = 1
+		// h.app.ClientError(w, http.StatusBadRequest)
+		// return
 	} else if currentPage > pageNumber {
 		h.app.ClientError(w, http.StatusNotFound)
+		return
 	}
 
 	data := h.app.NewTemplateData(r)
 	categories, err := h.service.GetAllCategory()
 	if err != nil {
 		h.app.ServerError(w, err)
+		return
 	}
 	data.Categories = categories
 
 	posts, err := h.service.GetAllPostPaginated(currentPage, pageSize)
 	if err != nil {
 		h.app.ServerError(w, err)
+		return
 	}
 
 	data.Posts = posts
@@ -59,7 +64,7 @@ func (h *handler) homePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filterCategoriesString := r.Form["categories"]
-	if len(filterCategoriesString) == 0{
+	if len(filterCategoriesString) == 0 {
 		h.app.ClientError(w, http.StatusBadRequest)
 		return
 	}
