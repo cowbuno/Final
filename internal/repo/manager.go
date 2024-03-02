@@ -6,7 +6,7 @@ import (
 )
 
 type UserRepo interface {
-	CreateUser(models.User) error
+	CreateUser(*models.User) error
 	GetUserByID(int) (*models.User, error)
 	GetUserByEmail(string) (*models.User, error)
 	// UpdateUserByID(string) (*models.User, error)

@@ -27,31 +27,31 @@ func (h *handler) loginPost(w http.ResponseWriter, r *http.Request) {
 	form.CheckField(validator.NotBlank(form.Email), "email", "This field cannot be blank")
 	form.CheckField(validator.NotBlank(form.Password), "password", "This field cannot be blank")
 
-	session, err := h.service.Authenticate(form.Email, form.Password)
-
 	if !form.Valid() {
 		data := h.app.NewTemplateData(r)
 		data.Form = form
-		h.app.Render(w, http.StatusUnprocessableEntity, "signup.html", data)
+		h.app.Render(w, http.StatusUnprocessableEntity, "login.html", data)
 		return
 	}
 
+	session, err := h.service.Authenticate(form.Email, form.Password)
+
 	if err != nil {
-		if errors.Is(err, models.ErrNoRecord) {
-			form.AddFieldError("email", "email doesn't exist")
-			data := h.app.NewTemplateData(r)
-			data.Form = form
-			h.app.Render(w, http.StatusUnprocessableEntity, "login.html", data)
-		} else if errors.Is(err, models.ErrInvalidCredentials) {
-			form.AddFieldError("password", models.ErrInvalidCredentials.Error())
-			data := h.app.NewTemplateData(r)
-			data.Form = form
-			h.app.Render(w, http.StatusUnprocessableEntity, "login.html", data)
+		if errors.Is(err, models.ErrNoRecord) || errors.Is(err, models.ErrInvalidCredentials) {
+			form.AddFieldError("general", "Invalid email or password")
+		} else if errors.Is(err, models.ErrNotActivated) {
+			form.AddFieldError("general", "Please confirm your registration")
 		} else {
 			h.app.ServerError(w, err)
+			return
 		}
+
+		data := h.app.NewTemplateData(r)
+		data.Form = form
+		h.app.Render(w, http.StatusUnprocessableEntity, "login.html", data)
 		return
 	}
+
 	cookie.SetSessionCookie(w, session.Token, session.ExpTime)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
@@ -87,7 +87,7 @@ func (h *handler) signupPost(w http.ResponseWriter, r *http.Request) {
 	}
 	//
 	user := form.FormToUser()
-	err := h.service.CreateUser(user)
+	err := h.service.CreateUser(&user)
 	if err != nil {
 		if errors.Is(err, models.ErrDuplicateEmail) {
 			form.AddFieldError("email", "Email address is already in use")

@@ -34,15 +34,16 @@ func (s *service) Authenticate(email string, password string) (*models.Session, 
 
 	return session, nil
 }
-func (s *service) CreateUser(user models.User) error {
-	err := s.repo.CreateUser(user)
+func (s *service) CreateUser(user *models.User) error {
+	err := s.repo.CreateUser(user) // Разыменование указателя
+
 	if err != nil {
 		return err
 	}
 
 	err = sendActivationEmail(user.Email, user.ActivationToken)
 	if err != nil {
-		return err
+		return err // Обработка ошибки отправки email
 	}
 	return nil
 }

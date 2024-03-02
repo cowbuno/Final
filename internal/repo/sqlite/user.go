@@ -43,11 +43,11 @@ func (s *Sqlite) CreateUserAndReturnID(u models.User) (int64, error) {
 	return id, nil
 }
 
-func (s *Sqlite) CreateUser(u models.User) error {
-	activationToken := generateActivationToken()
+func (s *Sqlite) CreateUser(u *models.User) error {
+	u.ActivationToken = generateActivationToken()
 	op := "sqlite.CreateUser"
 	stmt := `INSERT INTO users (name, email, hashed_password, is_activated, activation_token, created) VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`
-	_, err := s.db.Exec(stmt, u.Name, u.Email, string(u.HashedPassword), false, activationToken)
+	_, err := s.db.Exec(stmt, u.Name, u.Email, string(u.HashedPassword), false, u.ActivationToken)
 	if err != nil {
 		if err.Error() == "UNIQUE constraint failed: users.email" {
 			return models.ErrDuplicateEmail
@@ -74,16 +74,23 @@ func (s *Sqlite) GetUserByID(id int) (*models.User, error) {
 func (s *Sqlite) Authenticate(email, password string) (int, error) {
 	op := "sqlite.Authenticate"
 	var id int
-	var hashed_password []byte
-	stmt := `SELECT id, hashed_password FROM users WHERE email=?`
-	err := s.db.QueryRow(stmt, email).Scan(&id, &hashed_password)
+	var hashedPassword []byte
+	var isActivated bool
+
+	stmt := `SELECT id, hashed_password, is_activated FROM users WHERE email=?`
+	err := s.db.QueryRow(stmt, email).Scan(&id, &hashedPassword, &isActivated)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return 0, models.ErrNoRecord
 		}
 		return 0, fmt.Errorf("%s: %w", op, err)
 	}
-	err = bcrypt.CompareHashAndPassword(hashed_password, []byte(password))
+
+	if !isActivated {
+		return 0, models.ErrNotActivated
+	}
+
+	err = bcrypt.CompareHashAndPassword(hashedPassword, []byte(password))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return 0, models.ErrInvalidCredentials

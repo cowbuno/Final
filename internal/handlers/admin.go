@@ -61,7 +61,7 @@ func (h *handler) isAdmin(r *http.Request) bool {
 	if err != nil {
 		return false
 	}
-	if user.Email == "n@n" {
+	if user.Email == "prostok06@gmail.com" {
 		return true
 	}
 

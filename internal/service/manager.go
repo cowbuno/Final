@@ -20,7 +20,7 @@ type ServiceI interface {
 
 type UserServiceI interface {
 	GetUser(int) *models.User
-	CreateUser(models.User) error
+	CreateUser(*models.User) error
 	Authenticate(string, string) (*models.Session, error)
 	DeleteSession(string) error
 	UpdateUserPassword(token string, newPassword string) error
